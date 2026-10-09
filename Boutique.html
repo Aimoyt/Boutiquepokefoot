@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pokeprout</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f7ff;color:#17213d}.top{background:#122b55;color:#fff;text-align:center;padding:8px;font-size:13px}header{background:white;display:flex;align-items:center;gap:20px;padding:14px 5%;position:sticky;top:0;z-index:10;box-shadow:0 3px 18px #0001}.logo{font-weight:1000;font-size:25px;color:#173d75;cursor:pointer}.logo span{color:#773fe5}nav{display:flex;gap:6px;flex:1;justify-content:center;flex-wrap:wrap}button,.navbtn{border:0;border-radius:12px;padding:11px 15px;font-weight:800;cursor:pointer;text-decoration:none}.navbtn{color:#24304c;background:transparent}.navbtn:hover{background:#eee9ff}.cartbtn{background:#743fe5;color:#fff}.page{max-width:1150px;margin:auto;padding:35px 18px;min-height:75vh}.hero{border-radius:30px;padding:50px;background:linear-gradient(120deg,#dff8ff,#e5e0ff,#ffe9f7);display:flex;align-items:center;justify-content:space-between}.hero h1{font-size:clamp(40px,7vw,70px);margin:12px 0;color:#153567}.hero h1 span{color:#753fe4}.hero p{font-size:18px;max-width:600px;line-height:1.5}.heroicon{font-size:130px}.primary{background:#753fe4;color:#fff}.danger{background:#ffe1e1;color:#a00000}.soft{background:#eeeaff;color:#5430bd}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-top:20px}.card,.box{background:#fff;border-radius:22px;padding:18px;box-shadow:0 8px 25px #26385e12}.cover{height:220px;border-radius:16px;background:linear-gradient(140deg,#dce9ff,#f2dcff);display:flex;align-items:center;justify-content:center;font-size:90px}.card h3{margin:14px 0 5px}.price{font-size:23px;font-weight:1000;margin:10px 0}.full{width:100%}.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 0;border-bottom:1px solid #edf0f5}.qty{display:flex;align-items:center;gap:6px}.qty button{background:#eeeaff;color:#5730c7;padding:8px 12px}.total{text-align:right;font-size:27px;font-weight:1000;margin:25px 0}.form{display:grid;gap:12px;max-width:460px}.form input{padding:14px;border:1px solid #d9dfeb;border-radius:11px;font-size:16px}.admin{background:#101d36;color:#fff}.admin .row{border-color:#30405a}.admin h2,.admin h3{color:white}.notice{padding:14px;border-radius:12px;background:#f0edff;margin:9px 0;color:#17213d}.empty{text-align:center;padding:45px}footer{background:#122b55;color:#dbe6ff;text-align:center;padding:28px}#toast{position:fixed;bottom:20px;right:20px;background:#17213d;color:#fff;padding:14px 18px;border-radius:12px;opacity:0;transform:translateY(10px);transition:.2s;z-index:20}#toast.show{opacity:1;transform:none}@media(max-width:700px){header{flex-wrap:wrap}nav{order:3;width:100%}.hero{padding:30px;flex-direction:column;text-align:center}.heroicon{font-size:80px}}
+</style>
+</head>
+<body>
+<div class="top">🎁 Pokeprout · aucune paiement en ligne</div>
+<header>
+<div class="logo" onclick="go('home')">🌱 POKE<span>PROUT</span></div>
+<nav>
+<button class="navbtn" onclick="go('home')">Accueil</button>
+<button class="navbtn" onclick="go('shop')">Boutique</button>
+<button class="navbtn" onclick="go('account')">Mon compte</button>
+<button class="navbtn" onclick="go('orders')">Commandes</button>
+<button class="navbtn" onclick="go('admin')">Admin</button>
+</nav>
+<button class="cartbtn" onclick="go('cart')">🛒 Panier (<span id="count">0</span>)</button>
+</header>
+<div id="app"></div>
+<div id="toast"></div>
+<footer>🌱 Pokeprout · Boutique de boosters · Sans paiement</footer>
+
+<script>
+const ADMIN="prout 2026";
+const DEFAULT=[
+{id:1,name:"Booster Feu",price:4.99,emoji:"🔥"},
+{id:2,name:"Booster Plante",price:4.99,emoji:"🌿"},
+{id:3,name:"Booster Électrique",price:5.49,emoji:"⚡"},
+{id:4,name:"Booster Obscur",price:5.49,emoji:"🌑"}
+];
+let db;
+try{db=JSON.parse(localStorage.getItem("POKEPROUT_DB"))||null}catch(e){db=null}
+db=db||{products:DEFAULT,cart:{},user:null,orders:[],admin:false};
+function save(){localStorage.setItem("POKEPROUT_DB",JSON.stringify(db))}
+function euro(n){return n.toLocaleString("fr-FR",{style:"currency",currency:"EUR"})}
+function toast(t){const x=document.getElementById("toast");x.textContent=t;x.className="show";setTimeout(()=>x.className="",1800)}
+function go(page){location.hash=page;render()}
+function render(){const p=location.hash.replace("#","")||"home";document.getElementById("count").textContent=Object.values(db.cart).reduce((a,b)=>a+b,0);if(p==="shop")shop();else if(p==="cart")cart();else if(p==="account")account();else if(p==="orders")orders();else if(p==="admin")admin();else home()}
+window.addEventListener("hashchange",render);
+
+function home(){document.getElementById("app").innerHTML=`<main class="page">
+<section class="hero"><div><b>🎴 BOUTIQUE POKEPROUT</b><h1>Bienvenue chez <span>Pokeprout</span> !</h1><p>Découvre nos boosters et ajoute-les à ton panier. Tu peux ensuite valider ta commande sans effectuer de paiement.</p><button class="primary" onclick="go('shop')">Découvrir la boutique →</button></div><div class="heroicon">🎁</div></section>
+<h2>⭐ Boosters populaires</h2><div class="grid">${db.products.slice(0,4).map(product).join("")}</div></main>`}
+function product(p){return `<article class="card"><div class="cover">${p.emoji}</div><h3>${p.name}</h3><div class="price">${euro(p.price)}</div><button class="primary full" onclick="add(${p.id})">Ajouter au panier</button></article>`}
+function shop(){document.getElementById("app").innerHTML=`<main class="page"><h1>🎴 Boutique</h1><div class="grid">${db.products.map(product).join("")}</div></main>`}
+function add(id){db.cart[id]=(db.cart[id]||0)+1;save();render();toast("Ajouté au panier 🛒")}
+function qty(id,d){db.cart[id]=(db.cart[id]||0)+d;if(db.cart[id]<=0)delete db.cart[id];save();render()}
+function delCart(id){delete db.cart[id];save();render();toast("Article supprimé")}
+function cart(){let html="",total=0;for(const id in db.cart){const q=db.cart[id],p=db.products.find(x=>x.id==id);if(!p)continue;total+=p.price*q;html+=`<div class="row"><div><b>${p.emoji} ${p.name}</b><br>${euro(p.price)} × ${q}</div><div class="qty"><button onclick="qty(${p.id},-1)">−</button><b>${q}</b><button onclick="qty(${p.id},1)">+</button><button class="danger" onclick="delCart(${p.id})">Supprimer</button></div></div>`}
+let content=html;
+if(!html) content='<div class="empty"><h2>Panier vide</h2><button class="primary" onclick="go(\'shop\')">Voir la boutique</button></div>';
+else content+=`<div class="total">Total : ${euro(total)}</div><button class="primary" onclick="checkout()">Valider la commande — aucun paiement</button>`;
+document.getElementById("app").innerHTML=`<main class="page"><h1>🛒 Mon panier</h1><div class="box">${content}</div></main>`}
+function checkout(){if(!db.user){toast("Connecte-toi d'abord");go("account");return}let items=[],total=0;for(const id in db.cart){const q=db.cart[id],p=db.products.find(x=>x.id==id);if(p){items.push({name:p.name,qty:q});total+=p.price*q}}db.orders.unshift({id:Date.now(),email:db.user.email,date:new Date().toLocaleString("fr-FR"),items,total,status:"En attente"});db.cart={};save();toast("Commande enregistrée !");go("orders")}
+function account(){document.getElementById("app").innerHTML=`<main class="page"><h1>👤 Mon compte</h1><div class="box">${db.user?`<h2>Bonjour ${db.user.name} 👋</h2><p>${db.user.email}</p><button class="danger" onclick="logout()">Se déconnecter</button>`:`<h2>Connexion / inscription</h2><form class="form" onsubmit="login(event)"><input id="username" placeholder="Nom ou pseudo" required><input id="email" type="email" placeholder="Adresse e-mail" required><button class="primary">Se connecter</button></form>`}</div></main>`}
+function login(e){e.preventDefault();db.user={name:document.getElementById("username").value,email:document.getElementById("email").value};save();toast("Connecté !");render()}
+function logout(){db.user=null;save();render()}
+function orders(){if(!db.user){document.getElementById("app").innerHTML=`<main class="page"><h1>📋 Commandes</h1><div class="box">Connecte-toi pour voir tes commandes.</div></main>`;return}let os=db.orders.filter(x=>x.email===db.user.email);document.getElementById("app").innerHTML=`<main class="page"><h1>📋 Mes commandes</h1><div class="box">${os.length?os.map(o=>`<div class="notice"><b>Commande #${o.id}</b><br>${o.date}<br>${o.items.map(i=>i.name+" × "+i.qty).join(" · ")}<br><b>${euro(o.total)}</b> · ${o.status}</div>`).join(""):"Aucune commande."}</div></main>`}
+function admin(){if(!db.admin){document.getElementById("app").innerHTML=`<main class="page"><h1>🔐 Admin</h1><div class="box"><form class="form" onsubmit="adminLogin(event)"><input id="admincode" type="password" placeholder="Code admin" required><button class="primary">Entrer</button></form></div></main>`;return}document.getElementById("app").innerHTML=`<main class="page"><div class="box admin"><button class="danger" onclick="adminLogout()">Déconnexion</button><h2>📦 Gestion des boosters</h2><form class="form" onsubmit="newProduct(event)"><input id="newname" placeholder="Nom du booster" required><input id="newprice" type="number" step=".01" min="0" placeholder="Prix" required><input id="newemoji" value="🎴" placeholder="Emoji"><button class="primary">Ajouter</button></form><h3>Boosters</h3>${db.products.map(p=>`<div class="row"><span>${p.emoji} ${p.name} — ${euro(p.price)}</span><button class="danger" onclick="deleteProduct(${p.id})">Retirer</button></div>`).join("")}<h3>📋 Commandes</h3>${db.orders.length?db.orders.map(o=>`<div class="notice"><b>#${o.id}</b> · ${o.email}<br>${o.date} · ${euro(o.total)} · ${o.status}</div>`).join(""):"Aucune commande."}</div></main>`}
+function adminLogin(e){e.preventDefault();if(document.getElementById("admincode").value===ADMIN){db.admin=true;save();toast("Admin connecté");render()}else toast("Code incorrect")}
+function adminLogout(){db.admin=false;save();render()}
+function newProduct(e){e.preventDefault();db.products.push({id:Date.now(),name:document.getElementById("newname").value,price:Number(document.getElementById("newprice").value),emoji:document.getElementById("newemoji").value||"🎴"});save();toast("Booster ajouté");render()}
+function deleteProduct(id){db.products=db.products.filter(p=>p.id!==id);delete db.cart[id];save();toast("Booster retiré");render()}
+render();
+</script>
+</body>
+</html>
